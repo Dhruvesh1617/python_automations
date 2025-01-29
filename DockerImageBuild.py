@@ -22,12 +22,27 @@ def build_docker_image(dockerfile_path,image_name):
         print(f"Error building image:{e}")
         return None
     
+def run_docker_container(image_name):
+    client = docker.from_env()
 
+    # Run the container
+    print(f"Running container from image {image_name}...")
+    try:
+        container = client.containers.run(image_name, detach=True, tty=True)
+        print(f"Container {container.id} is running...")
+        return container
+    except docker.errors.APIError as e:
+        print(f"Error during container run: {e}")
+        return None
 
 def main():
-    dockerfile_path=os.path.abspath(".")
+    dockerfile_path=os.path.abspath(".")#mention path  of dockerfile
     image_name="custom_img:latest"
-    build_docker_image(dockerfile_path,image_name)
+    image=build_docker_image(dockerfile_path,image_name)
+    if image:
+       container=run_docker_container(image_name)
+       if container:
+            print(f"Container {container.id} is running in the background.")
     
 
 
